@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script>
+      //w3schools
+      function allowDrop(ev) {
+        ev.preventDefault();
+      }
+
+      function drag(ev) {
+        ev.dataTransfer.setData("text", ev.target.id);
+      }
+
+      function drop(ev) {
+        ev.preventDefault();
+        var data = ev.dataTransfer.getData("text");
+        ev.target.appendChild(document.getElementById(data));
+      }
+
+      function playAudio() {
+        var x = document.getElementById("myAudio");
+        x.play();
+      }
+
+
+  //     function dragstart_handler(ev) {
+  //   // Add the target element's id to the data transfer object
+  //   ev.dataTransfer.setData("application/my-app", ev.target.id);
+  //   ev.dataTransfer.effectAllowed = "move";
+  // }
+  // function dragover_handler(ev) {
+  //   ev.preventDefault();
+  //   ev.dataTransfer.dropEffect = "move";
+  // }
+  // function drop_handler(ev) {
+  //   ev.preventDefault();
+  //   // Get the id of the target and add the moved element to the target's DOM
+  //   const data = ev.dataTransfer.getData("application/my-app");
+  //   var z = document.createElement('p');
+  //   ev.target.appendChild(document.getElementById(data));
+  // }
+    </script>
+    <style>
+.dragger-containrer {
+  width: 300px;
+  height: 300px;
+  background-color: aqua;
+}
+
+#target{
+  width: 100px;
+  height: 100px;
+  background-color: blue;
+}
+    </style>
+  </head>
+  <body>
+    <div id="div1" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+
+    <img
+      id="drag1",
+      src="drop-files-here-extra.jpg",
+      draggable="true",
+      ondragstart="drag(event)",
+      width="auto",
+      height="auto",
+      autoplay = "false",
+      border = "2px solid grey",
+    />
+
+<!-- 
+<div class="dragger-containrer">
+    <p id="p1" draggable="true" ondragstart="dragstart_handler(event)">
+      This element is draggable.
+    </p>
+    <div
+      id="target"
+      ondrop="drop_handler(event)"
+      ondragover="dragover_handler(event)">
+      Drop Zone
+    </div>
+  </div> -->
+
+  
+  </body>
+</html>

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+
+    <style>
+      #audioDataContainer {
+        width: 200px;
+        height: 200px;
+        background-color: aqua;
+        border: 1px solid red;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="info">
+        <input type="file" id="fileInput" />
+        <p id="chunkID"></p>
+        <p id="chunkSize"></p>
+        <p id="format"></p>
+        <p id="subchunk1ID"></p>
+        <p id="audioFormat"></p>
+        <p id="numChannels"></p>
+        <p id="sampleRate"></p>
+        <p id="byteRate"></p>
+        <p id="blockAlign"></p>
+        <p id="bitsPerSample"></p>
+      </div>
+    </div>
+
+    <script>
+      document
+        .getElementById("fileInput")
+        .addEventListener("change", function (event) {
+          var file = event.target.files[0];
+          var reader = new FileReader();
+
+          reader.onload = function (e) {
+            var arrayBuffer = e.target.result;
+            parseWav(arrayBuffer);
+          };
+
+          reader.readAsArrayBuffer(file);
+        });
+
+      function parseWav(arrayBuffer) {
+        var view = new DataView(arrayBuffer);
+
+        // Read the RIFF chunk descriptor
+        var chunkID = String.fromCharCode(
+          view.getUint8(0),
+          view.getUint8(1),
+          view.getUint8(2),
+          view.getUint8(3)
+        );
+        var chunkSize = view.getUint32(4, true);
+        var format = String.fromCharCode(
+          view.getUint8(8),
+          view.getUint8(9),
+          view.getUint8(10),
+          view.getUint8(11)
+        );
+
+        // Read the fmt sub-chunk
+        var subchunk1ID = String.fromCharCode(
+          view.getUint8(12),
+          view.getUint8(13),
+          view.getUint8(14),
+          view.getUint8(15)
+        );
+        var subchunk1Size = view.getUint32(16, true);
+        var audioFormat = view.getUint16(20, true);
+        var numChannels = view.getUint16(22, true);
+        var sampleRate = view.getUint32(24, true);
+        var byteRate = view.getUint32(28, true);
+        var blockAlign = view.getUint16(32, true);
+        var bitsPerSample = view.getUint16(34, true);
+
+        // Do something with the parsed data
+        document.getElementById("chunkID").innerHTML = "chunk ID:" + chunkID;
+        document.getElementById("chunkSize").innerHTML =
+          "chunk Size:" + chunkSize;
+        document.getElementById("format").innerHTML = "audio Format" + format;
+        document.getElementById("subchunk1ID").innerHTML =
+          "Subchunk ID:" + subchunk1ID;
+        document.getElementById("audioFormat").innerHTML =
+          "Audio Format:" + audioFormat;
+        document.getElementById("numChannels").innerHTML =
+          "Sample Rate:" + numChannels;
+        document.getElementById("sampleRate").innerHTML =
+          "Sample Rate:" + sampleRate;
+        document.getElementById("byteRate").innerHTML =
+          "Duration:" + chunkSize / byteRate;
+        document.getElementById("blockAlign").innerHTML =
+          "Sample Rate:" + blockAlign;
+        document.getElementById("bitsPerSample").innerHTML =
+          "Sample Rate:" + bitsPerSample;
+      }
+    </script>
+  </body>
+</html>

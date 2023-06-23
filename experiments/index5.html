@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsmediatags/3.9.5/jsmediatags.js"></script>
+
+    <title>index5</title>
+
+    <style>
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+
+      #cover {
+        width: 300px;
+        height: 300px;
+        border: 1px solid black;
+        background-position: center;
+        background-size: cover;
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+      <input type="file" id="input" accept=".mp3, .wav, .flac" />
+      <div id="cover"></div>
+      <p id="title"></p>
+      <p id="artist"></p>
+      <p id="album"></p>
+      <p id="genre"></p>
+    </div>
+
+    <input type="button" value="PLAY" onclick="playAudio()">
+    <audio id="audio" src="https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3"></audio>
+
+
+    <script>
+      const jsmediatags = window.jsmediatags;
+
+      document.querySelector("#input").addEventListener("change", (event) => {
+        const file = event.target.files[0];
+
+        jsmediatags.read(file, {
+          onSuccess: function (tag) {
+            // if no picture or format exists then the code fails but I didn't know this until i figured it out. need this to be unit tested with proper feedback. the mp3 needs to have all the information that we ask of it in the code.
+            const data = tag.tags.picture.data;
+            const format = tag.tags.picture.format;
+            let base64String = "";
+
+            for (let i = 0; i < data.length; i++) {
+              base64String += String.fromCharCode(data[i]);
+            }
+
+            console.log(tag);
+            document.querySelector(
+              "#cover"
+            ).style.backgroundImage = `url(data:${format};base64,${window.btoa(
+              base64String
+            )})`;
+            document.querySelector("#title").textContent = tag.tags.title;
+            document.querySelector("#artist").textContent = tag.tags.artist;
+            document.querySelector("#album").textContent = tag.tags.album;
+            document.querySelector("#genre").textContent = tag.tags.genre;
+          },
+          onError: function (error) {
+            console.log(error);
+          },
+        });
+      });
+
+      fetch("http://httpbin.org/ip")
+        .then((res) => res.json())
+        .then((data) => {
+          console.log(data);
+        })
+        .catch((err) => console.error(err));
+
+      function playAudio() {
+        var audio = new Audio(file());
+        audio.play();
+      }
+
+
+    </script>
+  </body>
+</html>
