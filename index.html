@@ -1,46 +1,108 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
     <div class="container">
       <div class="wav-file-extractor">
         <div class="drag-drop">
-            <div class="inner-container">
-
-                <h3 class="wav-file-extractor-header">WAV FILE EXTRACTOR</h3>
-                <h4 class="drag-file-text">DRAG FILE</h4>
-                <!-- <h4 class="drop-here-text">DROP HERE</h4>
-                <h4 class="file-dropped-text">FILE DROPPED</h4> -->
-              </div>
-                <div class="info">
-                  <h3 class="results-header">WAV FILE EXTRACTOR</h3>
-
-                    <input type="file" id="fileInput" />
-                    <p id="chunkID"></p>
-                    <p id="chunkSize"></p>
-                    <p id="format"></p>
-                    <p id="subchunk1ID"></p>
-                    <p id="audioFormat"></p>
-                    <p id="numChannels"></p>
-                    <p id="sampleRate"></p>
-                    <p id="byteRate"></p>
-                    <p id="blockAlign"></p>
-                    <p id="bitsPerSample"></p>
-                  </div>
+          <div class="inner-container">
+            <div
+              id="drop_zone"
+              ondrop="dropHandler(event);"
+              ondragover="dragOverHandler(event);"
+            >
+              <h3 class="wav-file-extractor-header">WAV FILE EXTRACTOR</h3>
+              <h4 id="drag-file-text">DRAG FILE</h4>
             </div>
-    
           </div>
+          <input type="file" id="fileInput" />
+
+          <div class="info">
+            <h3 class="results-header">WAV FILE EXTRACTOR</h3>
+            <p id="chunkID"></p>
+            <p id="chunkSize"></p>
+            <p id="format"></p>
+            <p id="subchunk1ID"></p>
+            <p id="audioFormat"></p>
+            <p id="numChannels"></p>
+            <p id="sampleRate"></p>
+            <p id="byteRate"></p>
+            <p id="blockAlign"></p>
+            <p id="bitsPerSample"></p>
+          </div>
+        </div>
+      </div>
     </div>
 
-
     <script>
-         document
+      function dropHandler(ev) {
+        document.getElementById("drag-file-text").innerHTML = ("FILE DROPPED");
+
+        // Prevent default behavior (Prevent file from being opened)
+        ev.preventDefault();
+
+        if (ev.dataTransfer.items) {
+          // Use DataTransferItemList interface to access the file(s)
+          [...ev.dataTransfer.items].forEach((item, i) => {
+            // If dropped items aren't files, reject them
+            if (item.kind === "file") {
+              const file = item.getAsFile();
+              console.log(`… file[${i}].name = ${file.name}`);
+            }
+          });
+        } else {
+          // Use DataTransfer interface to access the file(s)
+          [...ev.dataTransfer.files].forEach((file, i) => {
+            console.log(`… file[${i}].name = ${file.name}`);
+          });
+        }
+      }
+
+      function dragOverHandler(ev) {
+        document.getElementById("drag-file-text").innerHTML = ("DROP HERE");
+
+        // Prevent default behavior (Prevent file from being opened)
+        ev.preventDefault();
+      }
+
+      //drag and drop functionality, allows us to remove input area
+      let dropArea = document.getElementById("drop_zone");
+      if (dropArea) {
+        ["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
+          dropArea.addEventListener(eventName, preventDefaults, false);
+        });
+      }
+
+      function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      if (dropArea) {
+        ["dragenter", "dragover"].forEach((eventName) => {
+          dropArea.addEventListener(eventName, highlight, false);
+        });
+        ["dragleave", "drop"].forEach((eventName) => {
+          dropArea.addEventListener(eventName, unhighlight, false);
+        });
+      }
+      //styling for drag and drop
+      function highlight(e) {
+        dropArea.classList.add("highlight");
+      }
+
+      function unhighlight(e) {
+        dropArea.classList.remove("highlight");
+      }
+
+      //drag and drop functionality
+
+      document
         .getElementById("fileInput")
         .addEventListener("change", function (event) {
           var file = event.target.files[0];
@@ -88,25 +150,17 @@
         var bitsPerSample = view.getUint16(34, true);
 
         // Do something with the parsed data
-        document.getElementById("chunkID").innerHTML = "chunk ID:" + chunkID;
-        document.getElementById("chunkSize").innerHTML =
-          "chunk Size:" + chunkSize;
-        document.getElementById("format").innerHTML = "audio Format" + format;
-        document.getElementById("subchunk1ID").innerHTML =
-          "Subchunk ID:" + subchunk1ID;
-        document.getElementById("audioFormat").innerHTML =
-          "Audio Format:" + audioFormat;
-        document.getElementById("numChannels").innerHTML =
-          "Sample Rate:" + numChannels;
-        document.getElementById("sampleRate").innerHTML =
-          "Sample Rate:" + sampleRate;
-        document.getElementById("byteRate").innerHTML =
-          "Duration:" + chunkSize / byteRate;
-        document.getElementById("blockAlign").innerHTML =
-          "Sample Rate:" + blockAlign;
-        document.getElementById("bitsPerSample").innerHTML =
-          "Sample Rate:" + bitsPerSample;
+        document.getElementById("chunkID").innerHTML = "chunk ID: " + chunkID;
+        document.getElementById("chunkSize").innerHTML = "chunk Size: " + chunkSize;
+        document.getElementById("format").innerHTML = "Audio Format: " + format;
+        document.getElementById("subchunk1ID").innerHTML = "Subchunk ID: " + subchunk1ID;
+        document.getElementById("audioFormat").innerHTML = "Audio Format: " + audioFormat;
+        document.getElementById("numChannels").innerHTML = "Number of Channels: " + numChannels;
+        document.getElementById("sampleRate").innerHTML = "Sample Rate: " + sampleRate;
+        document.getElementById("byteRate").innerHTML = "Byte Rate: " + chunkSize / byteRate;
+        document.getElementById("blockAlign").innerHTML = "Block Align: " + blockAlign;
+        document.getElementById("bitsPerSample").innerHTML = "Bits Per Sample: " + bitsPerSample;
       }
     </script>
-</body>
+  </body>
 </html>
